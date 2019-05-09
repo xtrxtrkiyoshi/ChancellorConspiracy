@@ -12,7 +12,8 @@ class Board extends React.Component {
 			size: 2,
 			grid: Array(2).fill(0).map(x=>Array(2).fill("+")),
 			noSolution: null,
-			currentView: 1
+			currentView: 1,
+      solutions: [""]
 		};
 
 		this.onBackward = this.onBackward.bind(this);
@@ -21,6 +22,7 @@ class Board extends React.Component {
 		this.generateSolutions = this.generateSolutions.bind(this);
 		this.before = this.before.bind(this);
 		this.after = this.after.bind(this);
+    this.occupyBoard = this.occupyBoard.bind(this);
 	}
 
 
@@ -62,6 +64,14 @@ class Board extends React.Component {
     }
   }
 
+   occupyBoard() {
+    //occupying board
+    for(let i = 0; i < this.state.size; i++) {
+      //pseudocode
+      this.state.grid[i][this.state.solutions[this.state.currentView-1][i]-1] = <Square key={i+"_"+(this.state.solutions[this.state.currentView-1][i]-1)} value="C"/>;
+    }
+  }
+
   generateSolutions() {
   	let initialized_arr = new Array(this.state.size);
   	let start = 0;
@@ -76,7 +86,7 @@ class Board extends React.Component {
   	let duplicate_invalid = 0;
   	let count = 0;
     let noSolutions = 0;
-    let solutions = [];
+    let tempSolutions = [];
     let solution = "";
 
   	//created 2D array for stack
@@ -109,7 +119,7 @@ class Board extends React.Component {
                   solution = solution + option[i][nopts[i]];
   						}
               //adds to array of solutions
-              solutions[noSolutions] = solution;
+              tempSolutions[noSolutions] = solution;
               noSolutions++;
   					}
   					duplicate_temp = 0;
@@ -142,12 +152,14 @@ class Board extends React.Component {
   		}
   	}
 
-    for(i = 0; i < this.state.size; i++) {
-      this.state.grid[i][solutions[this.state.currentView-1][i]-1] = <Square key={i+"_"+(solutions[this.state.currentView-1][i]-1)} value="C"/>;
-      console.log(solutions[this.state.currentView-1][i]);
-    }
+    const arr = [...tempSolutions, ...this.state.solutions];
+  	this.setState({
+      noSolution: count, 
+      currentView: 1, 
+    });
+    this.setState({solutions: arr}, () => this.occupyBoard());
 
-  	this.setState({noSolution: count, currentView: 1});
+    //this.occupyBoard();
   }
 
 	render() {
