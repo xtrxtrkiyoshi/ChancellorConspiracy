@@ -1,7 +1,6 @@
 import React from 'react';
 
 import Square from './Square';
-import Solutions from './Solutions';
 
 import './Board.css';
 
@@ -13,12 +12,12 @@ class Board extends React.Component {
 			size: 2,
 			grid: Array(2).fill(0).map(x=>Array(2).fill("+")),
 			noSolution: null,
-			currentView: 0
+			currentView: 1
 		};
 
 		this.onBackward = this.onBackward.bind(this);
-    	this.onForward = this.onForward.bind(this);
-    	this.handleInput = this.handleInput.bind(this);
+  	this.onForward = this.onForward.bind(this);
+  	this.handleInput = this.handleInput.bind(this);
 		this.generateSolutions = this.generateSolutions.bind(this);
 		this.before = this.before.bind(this);
 		this.after = this.after.bind(this);
@@ -42,20 +41,25 @@ class Board extends React.Component {
 
   handleInput(e) {
   	this.setState({size: parseInt(e.target.value, 10)});
-  	if(e.target.value != ""){
+  	if(e.target.value !== ""){
   		this.setState({grid: Array(parseInt(e.target.value, 10)).fill(0).map(x=>Array(parseInt(e.target.value, 10)).fill("+"))})	
   	}
   	
   }
 
   after() {
-  	let temp = this.state.currentView + 1;
-  	this.setState({currentView: temp});
+    if(this.state.currentView+1 <= this.state.size){
+      let temp = this.state.currentView + 1;
+      this.setState({currentView: temp});
+    }
   }
 
   before() {
-  	let temp = this.state.currentView - 1;
-  	this.setState({currentView: temp});
+    if(this.state.currentView-1 > 0){
+      let temp = this.state.currentView - 1;
+      this.setState({currentView: temp});
+  
+    }
   }
 
   generateSolutions() {
@@ -71,6 +75,9 @@ class Board extends React.Component {
   	let candidate_sequence = 0;
   	let duplicate_invalid = 0;
   	let count = 0;
+    let noSolutions = 0;
+    let solutions = [];
+    let solution = "";
 
   	//created 2D array for stack
   	for (let i = 0; i < (this.state.size+2); i++ ) {
@@ -96,10 +103,14 @@ class Board extends React.Component {
   					if(candidate_sequence !== 0) {
   						duplicate_invalid = 0;
   						count++;
-  						for(let i = 1; i < move; i++) {
-
+  						solution = "";
+              for(let i = 1; i < move; i++) {
+                  //prints a solution to a string
+                  solution = solution + option[i][nopts[i]];
   						}
-
+              //adds to array of solutions
+              solutions[noSolutions] = solution;
+              noSolutions++;
   					}
   					duplicate_temp = 0;
   					candidate_count = 0;
@@ -130,9 +141,13 @@ class Board extends React.Component {
   			nopts[move]--;
   		}
   	}
-  	console.log(count);
 
-  	this.setState({noSolution: count, currentView: 0});
+    for(i = 0; i < this.state.size; i++) {
+      this.state.grid[i][solutions[this.state.currentView-1][i]-1] = <Square key={i+"_"+(solutions[this.state.currentView-1][i]-1)} value="C"/>;
+      console.log(solutions[this.state.currentView-1][i]);
+    }
+
+  	this.setState({noSolution: count, currentView: 1});
   }
 
 	render() {
@@ -148,7 +163,8 @@ class Board extends React.Component {
 	      <tr key={"row_"+i}>
 	        {r.map((d, j) => {return(
 	          <Square
-	            key={i+"_"+j}/>
+	            key={i+"_"+j}
+              value=""/>
 	              )
 	            }
 	          )
