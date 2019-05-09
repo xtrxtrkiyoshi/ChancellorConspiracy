@@ -28,6 +28,8 @@ export class Square extends React.Component{
             boarderColor: 'black',
             border:".5px solid black"
           }}>
+          <button>
+          </button>
         </td>
         
       

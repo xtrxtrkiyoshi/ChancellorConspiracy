@@ -1,3 +1,7 @@
-.container {
+.flex-grid {
 	display: flex;
+}
+
+.col {
+	flex: 1;
 }

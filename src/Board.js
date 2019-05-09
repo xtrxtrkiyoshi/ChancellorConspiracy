@@ -10,10 +10,12 @@ class Board extends React.Component {
 
 		this.state = {
 			size: 2,
-			grid: Array(2).fill(0).map(x=>Array(2).fill("+")),
+			grid: Array(2).fill(0).map(x=>Array(2).fill()),
 			noSolution: null,
 			currentView: 1,
-      solutions: [""]
+      solutions: [""],
+      x: 0,
+      y: 0
 		};
 
 		this.onBackward = this.onBackward.bind(this);
@@ -30,7 +32,7 @@ class Board extends React.Component {
     if(this.state.size > 1) {
       let temp = this.state.size-1;
       this.setState({size: temp}); 
-      this.setState({grid: Array(temp).fill(0).map(x=>Array(temp).fill("+"))});
+      this.setState({grid: Array(temp).fill(0).map(x=>Array(temp))});
     }
     
   }
@@ -38,21 +40,23 @@ class Board extends React.Component {
   onForward() {
     let temp = this.state.size+1;
     this.setState({size: temp});
-	this.setState({grid: Array(temp).fill(0).map(x=>Array(temp).fill("+"))});
+	  this.setState({grid: Array(temp).fill(0).map(x=>Array(temp).fill())});
   }
 
   handleInput(e) {
   	this.setState({size: parseInt(e.target.value, 10)});
   	if(e.target.value !== ""){
-  		this.setState({grid: Array(parseInt(e.target.value, 10)).fill(0).map(x=>Array(parseInt(e.target.value, 10)).fill("+"))})	
+  		this.setState({grid: Array(parseInt(e.target.value, 10)).fill(0).map(x=>Array(parseInt(e.target.value, 10)))})	
   	}
   	
   }
 
   after() {
-    if(this.state.currentView+1 <= this.state.size){
+    console.log(this.state.currentView+1 <= this.state.noSolution);
+    if(this.state.currentView+1 <= this.state.noSolution){
       let temp = this.state.currentView + 1;
       this.setState({currentView: temp});
+      this.occupyBoard();
     }
   }
 
@@ -60,16 +64,31 @@ class Board extends React.Component {
     if(this.state.currentView-1 > 0){
       let temp = this.state.currentView - 1;
       this.setState({currentView: temp});
+      this.occupyBoard();
   
     }
   }
 
    occupyBoard() {
     //occupying board
-    for(let i = 0; i < this.state.size; i++) {
       //pseudocode
-      this.state.grid[i][this.state.solutions[this.state.currentView-1][i]-1] = <Square key={i+"_"+(this.state.solutions[this.state.currentView-1][i]-1)} value="C"/>;
-    }
+      //this.state.grid[i][this.state.solutions[this.state.currentView-1][i]-1] = <Square key={i+"_"+(this.state.solutions[this.state.currentView-1][i]-1)} value="C"/>;
+      let count = 0;
+      let table = [];
+      for(let k = 0; k < this.state.size; k++) {
+        let children = []
+        let temp2 = this.state.solutions[this.state.currentView-1][k]-1;
+        for(let j = 0; j < this.state.size; j++) {
+          if(j === temp2){
+            children.push(<Square key={k+"_"+j} value ="C"/>);
+            count++;
+          } else {
+            children.push(<Square key={k+"_"+j} value =""/>);  
+          }
+        }
+        table.push(<tr>{children}</tr>);
+      }
+      this.setState({grid: table});
   }
 
   generateSolutions() {
@@ -162,28 +181,26 @@ class Board extends React.Component {
     //this.occupyBoard();
   }
 
+  createBoard() {
+    let table = [];
+    for(let i = 0; i < this.state.size; i++) {
+      let children = []
+      for(let j = 0; j < this.state.size; j++) {
+        children.push(<Square key={i+"_"+j} value =""/>);
+      }
+      table.push(<tr>{children}</tr>);
+    }
+    return table;
+  }
+
 	render() {
 		const style = {
 	      margin:'auto',
 	      width: "auto",
 	      height:"auto",
-	      backgroundColor:'darkorange',
-	      color:'white',
 	      fontSize:"3em"
 	    }
-	    const rows = this.state.grid.map((r, i) => {return (
-	      <tr key={"row_"+i}>
-	        {r.map((d, j) => {return(
-	          <Square
-	            key={i+"_"+j}
-              value=""/>
-	              )
-	            }
-	          )
-	        }
-	        </tr>)
-	        }
-	      );
+	    
 		return(
 		<div>
 			<div>
@@ -205,12 +222,16 @@ class Board extends React.Component {
 			<div className="container">
 		        <table cellSpacing="0" id="table" style={style}>
 		          <tbody>
-		            {rows}
-		          </tbody>
+		            { 
+                  this.state.grid.map((i) => {
+                  return i
+                })}
+              </tbody>
 		        </table>
 		    </div>
 		</div>);
 	}
+
 }
 
 export default Board;
