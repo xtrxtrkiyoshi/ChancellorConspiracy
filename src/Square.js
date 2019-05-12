@@ -3,15 +3,12 @@ import React from 'react';
 export class Square extends React.Component{
   constructor(props){
     super(props);
-    this.state = {
-      value: this.props.value
-    }
   }
   render(){
-    console.log(this.state.value);
+    console.log(this.props.value);
     return (
         <td
-          style={this.state.value?{
+          style={this.props.value?{
             overflow:'hidden',
             width:'50px',
             height:'50px',
