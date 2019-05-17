@@ -5,6 +5,7 @@ import Square from './Square';
 import './Board.css';
 
 class Board extends React.Component {
+
   constructor(props) {
     super(props);
 
@@ -13,7 +14,8 @@ class Board extends React.Component {
       grid: Array(2).fill(0).map(x=>Array(2).fill("+")),
       noSolution: null,
       currentView: 1,
-      solutions: [""]
+      solutions: [""],
+      fileReader: ""
     };
 
     this.onBackward = this.onBackward.bind(this);
@@ -23,6 +25,7 @@ class Board extends React.Component {
     this.before = this.before.bind(this);
     this.after = this.after.bind(this);
     this.occupyBoard = this.occupyBoard.bind(this);
+    this.handleFileChosen = this.handleFileChosen.bind(this);
   }
 
 
@@ -87,6 +90,14 @@ class Board extends React.Component {
     }
 
     this.setState({grid: temp});
+  }
+
+  handleFileChosen(file) {
+    let temp = new FileReader();
+    temp.readAsText(file);
+    this.setState({fileReader: temp});
+    console.log("hello");
+    console.log(this.state.fileReader);
   }
 
   generateSolutions() {
@@ -230,6 +241,14 @@ class Board extends React.Component {
                 {rows}
               </tbody>
             </table>
+        </div>
+        <div>
+          <input type="file"
+                  id="file"
+                  className="input-file"
+                  accept=".txt"
+                  onChange={e => this.handleFileChosen(e.target.files[0])}
+                  />
         </div>
     </div>);
   }
